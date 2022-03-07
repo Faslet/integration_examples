@@ -1,0 +1,31 @@
+{
+  "name": "faslet/magento2",
+  "description": "A sample Magento2 integration",
+  "type": "project",
+  "require": {
+    "faslet/faslet": "^0.1.0"
+  },
+  "require-dev": {
+    "magento/product-community-edition": "^2.4"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Faslet Team",
+      "email": "tech@faslet.me"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://repo.magento.com/"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "laminas/laminas-dependency-plugin": false,
+      "magento/magento-composer-installer": false,
+      "magento/inventory-composer-installer": false
+    }
+  }
+}
