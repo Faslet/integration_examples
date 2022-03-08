@@ -6,7 +6,8 @@ What's included
 
 - [x] Widget integration in product pages
 - [x] Getting the brand, product info and variants from a Configurable product
-- [x] Order tracking snippet. There is some scaffolding, but the work is not finished.
+- [x] Add to cart inside the widget
+- [x] Order tracking
 
 What's not included
 - [ ] Getting the Tag from the product attributes. If your store requires Faslet Tags (as opposed to product ids), then you need to pass these through from the back office to be configurable by the store manager.
