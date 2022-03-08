@@ -2,8 +2,8 @@
 
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="product.info.form.options">
-            <block class="Faslet\Widget\Block\FasletWidget" name="fasletwidget" template="Faslet_Widget::faslet-widget.phtml" />
+        <referenceBlock name="content">
+            <block class="Faslet\Widget\Block\FasletWidget" name="fasletwidget" template="Faslet_Widget::faslet-order-tracking.phtml" />
         </referenceBlock>
     </body>
 </page>
