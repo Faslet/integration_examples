@@ -9,7 +9,7 @@ use Magento\Catalog\Block\Product\ListProduct;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\Logger\Monolog;
-use Magento\Framework\Data\Form\FormKey;
+use Magento\Checkout\Model\Session;
 
 class FasletWidget extends Template
 {
@@ -18,7 +18,7 @@ class FasletWidget extends Template
   private $productRepository;
   private $logger;
   private $listProduct;
-  private $formKey;
+  private $checkoutSession;
   private $shopId = "Faslet Demo";
 
 
@@ -27,7 +27,7 @@ class FasletWidget extends Template
     ProductRepository $productRepository,
     Monolog $logger,
     ListProduct $listProduct,
-    FormKey $formKey,
+    Session $checkoutSession,
     array $data = []
   ) {
     $this->logger = $logger;
@@ -35,7 +35,7 @@ class FasletWidget extends Template
 
     $this->productRepository = $productRepository;
     $this->listProduct = $listProduct;
-    $this->formKey = $formKey;
+    $this->checkoutSession = $checkoutSession;
 
     $this->widget = new Widget($this->shopId);
     $this->orderTracking = new OrderTracking($this->shopId);
@@ -46,13 +46,38 @@ class FasletWidget extends Template
   public function getFasletOrderTrackingSnippet()
   {
     $this->logger->debug('creating faslet order tracking snippet');
+    $order = $this->checkoutSession->getLastRealOrder();
+
+    $orderId = $order->getRealOrderId();
+    $orderStatus = $order->getStatus();
 
     $this->orderTracking
-      ->withOrderNumber("")
-      ->withPaymentStatus("");
+      ->withOrderNumber($orderId)
+      ->withPaymentStatus($orderStatus);
 
-    $this->orderTracking
-      ->buildOrderTracking();
+    foreach ($order->getAllItems() as $orderItem) {
+
+      $productId = $orderItem->getProductId();
+      $productName = $orderItem->getName();
+      $price = $orderItem->getPrice();
+      $quantity = $orderItem->getQtyToInvoice();
+
+      // Magento adds 2 items to your cart, one being the parent product, one being the variant. Variant is added with quantity 0, so skip that.
+      if ($quantity == 0) {
+        continue;
+      }
+
+      $sku = $orderItem->getSku();
+
+      // Since the SKU is not the product, but rather an option of it
+      $variant = $this->productRepository->get($sku);
+      $variantId = $variant->getId();
+      $variantName = $variant->getName();
+
+      $this->orderTracking->addProduct($productId, $variantId, $productName, $variantName, $price * $quantity, $quantity, $sku);
+    }
+
+    return $this->orderTracking->buildOrderTracking();
   }
 
   public function getFasletWidgetScriptTag()
@@ -63,11 +88,11 @@ class FasletWidget extends Template
 
   public function getFasletWidgetSnippet()
   {
-    // These are based on our demo store, please change these for your store, or fetch them from Magento
-    $COLOR_ID = 4;
-    $SIZE_ID = 5;
+    // These are based on our demo store, please change these for your store
+    $COLOR_CODE = "color";
+    $SIZE_CODE = "size";
     $MANUFACTURER_CODE = "manufacturer";
-    // TODO: Get this from a custom attribute
+    // TODO: Get this from a custom attribute per product, or contact Faslet about using Product IDs
     $TAG_FOR_THIS_PRODUCT = "Faslet_Jacket_Male";
 
     $this->logger->debug('creating faslet widget snippet');
@@ -97,18 +122,31 @@ class FasletWidget extends Template
       ->withProductName($product->getName())
       ->withFasletProductTag($TAG_FOR_THIS_PRODUCT);
 
+    $colorSuperId = "";
+    $sizeSuperId = "";
+
+    // TODO: I don't like this, but I can't see a better way to get the attribute ids out, or get a basic add to cart url for a product option
+    foreach ($product->getAttributes() as $attribute) {
+      if ($attribute->getName() === $COLOR_CODE) {
+        $colorSuperId = $attribute->getAttributeId();
+      } else if ($attribute->getName() === $SIZE_CODE) {
+        $sizeSuperId = $attribute->getAttributeId();
+      }
+    }
+
     $configOptions = $product->getExtensionAttributes()->getConfigurableProductOptions();
 
     $colorOptions = [];
     $sizeOptions = [];
 
     foreach ($configOptions as $configOption) {
-      if ($configOption->getId() == $COLOR_ID) {
+      if ($configOption["attribute_id"] == $colorSuperId) {
         $colorOptions = $configOption->getOptions();
-      } else if ($configOption->getId() == $SIZE_ID) {
+      } else if ($configOption["attribute_id"] == $sizeSuperId) {
         $sizeOptions = $configOption->getOptions();
       }
     }
+
 
     $linkedProductIds = $product->getExtensionAttributes()->getConfigurableProductLinks();
 
@@ -116,16 +154,14 @@ class FasletWidget extends Template
       $this->widget->addColor($colorOption["value_index"], $colorOption["label"]);
     }
 
-    $baseCartUrl = $this->listProduct->getAddToCartUrl($product);
-    $fk = $this->formKey->getFormKey();
-    $baseCartUrl = substr($baseCartUrl, 0, -3) . "%id%/?qty=1&form_key=$fk";
+    $variants = [];
 
     foreach ($linkedProductIds as $linkedProductId) {
 
       $linkedProduct = $this->productRepository->getById($linkedProductId);
       $isSalable = $linkedProduct->getIsSalable();
-      $color = $linkedProduct->getCustomAttribute("color");
-      $size = $linkedProduct->getCustomAttribute("size");
+      $color = $linkedProduct->getCustomAttribute($COLOR_CODE);
+      $size = $linkedProduct->getCustomAttribute($SIZE_CODE);
       $colorValue = $color->getValue();
       $sizeValue = $size->getValue();
       $sizeLabel = "";
@@ -136,12 +172,24 @@ class FasletWidget extends Template
         }
       }
 
+      $variants[$linkedProductId] = ["size" => $sizeValue, "color" => $colorValue];
+
       $this->widget->addVariant($linkedProductId, $sizeLabel, $isSalable, $linkedProduct->getSku(), $colorValue);
     }
 
+    $baseCartUrl = $this->listProduct->getAddToCartUrl($product);
+    $baseCartUrl = $baseCartUrl . "?qty=1&form_key=%fk%&selected_configurable_option=%id%&super_attribute[$sizeSuperId]=%sid%&super_attribute[$colorSuperId]=%cid%";
+
     $this->widget->withAddToCartSnippet("
     function(id) {
-      return fetch(\"$baseCartUrl\".replace(\"%id%\", id), { \"method\": \"POST\" }).then(function() { window.location.reload() });
+      var variants = " . json_encode($variants) . ";
+      var formKey = document.forms['product_addtocart_form'].querySelector('input[name=form_key]').value;
+      return fetch(\"$baseCartUrl\"
+          .replace(\"%id%\", id)
+          .replace(\"%fk%\", formKey)
+          .replace(\"%sid%\", variants[id].size)
+          .replace(\"%cid%\", variants[id].color), 
+        { \"method\": \"POST\" }).then(function() { window.location.reload() });
     }");
 
     return $this->widget->buildWidget();
