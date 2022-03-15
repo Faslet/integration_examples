@@ -7,4 +7,4 @@ A selection of integration examples for different platforms
 
 ## Contact
 
-For more info, or if you have any questions, please context tech@faslet.me.
+For more info, or if you have any questions, please contact tech@faslet.me.
