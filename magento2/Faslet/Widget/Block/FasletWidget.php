@@ -60,6 +60,7 @@ class FasletWidget extends Template
       $productId = $orderItem->getProductId();
       $productName = $orderItem->getName();
       $price = $orderItem->getPrice();
+      // This may not work for your store, adjust this to what works for your store.
       $quantity = $orderItem->getQtyToInvoice();
 
       // Magento adds 2 items to your cart, one being the parent product, one being the variant. Variant is added with quantity 0, so skip that.
@@ -92,11 +93,10 @@ class FasletWidget extends Template
     $COLOR_CODE = "color";
     $SIZE_CODE = "size";
     $MANUFACTURER_CODE = "manufacturer";
-    // TODO: Get this from a custom attribute per product, or contact Faslet about using Product IDs
-    $TAG_FOR_THIS_PRODUCT = "Faslet_Jacket_Male";
 
     $this->logger->debug('creating faslet widget snippet');
 
+    // This should be the parent product id, not a variant id
     $id = $this->getRequest()->getParam('id');
 
     $product = $this->productRepository->getById($id);
@@ -119,8 +119,7 @@ class FasletWidget extends Template
       ->withBrand($brandName)
       ->withProductId("$id")
       ->withProductImage($image)
-      ->withProductName($product->getName())
-      ->withFasletProductTag($TAG_FOR_THIS_PRODUCT);
+      ->withProductName($product->getName());
 
     $colorSuperId = "";
     $sizeSuperId = "";
