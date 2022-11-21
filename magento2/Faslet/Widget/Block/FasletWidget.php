@@ -173,7 +173,7 @@ class FasletWidget extends Template
 
       $variants[$linkedProductId] = ["size" => $sizeValue, "color" => $colorValue];
 
-      $this->widget->addVariant($linkedProductId, $sizeLabel, $isSalable, $linkedProduct->getSku(), $colorValue);
+      $this->widget->addVariant($linkedProductId, $sizeLabel, $isSalable, $linkedProduct->getSku(), $colorValue, $linkedProduct->getPrice());
     }
 
     $baseCartUrl = $this->listProduct->getAddToCartUrl($product);

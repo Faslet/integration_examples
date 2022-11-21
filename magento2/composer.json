@@ -3,7 +3,7 @@
   "description": "A sample Magento2 integration",
   "type": "project",
   "require": {
-    "faslet/faslet": "^0.1.0"
+    "faslet/faslet": "^0.2.0"
   },
   "require-dev": {
     "magento/product-community-edition": "^2.4"

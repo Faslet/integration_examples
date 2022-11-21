@@ -4,8 +4,51 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3cf99e66c16ccace1dd55c99624e83e0",
+    "content-hash": "b3aa4d9ecb787573dd069ec9ad10d87b",
     "packages": [
+        {
+            "name": "faslet/faslet",
+            "version": "v0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Faslet/widget_php_module.git",
+                "reference": "4fb211fe9050290674f66a700b898ce984ebaf1f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Faslet/widget_php_module/zipball/4fb211fe9050290674f66a700b898ce984ebaf1f",
+                "reference": "4fb211fe9050290674f66a700b898ce984ebaf1f",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Faslet\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Faslet Team",
+                    "email": "technology@faslet.me"
+                }
+            ],
+            "description": "The Faslet Size Me Up Widget",
+            "homepage": "https://github.com/Faslet/widget_php_module",
+            "support": {
+                "issues": "https://github.com/Faslet/widget_php_module/issues",
+                "source": "https://github.com/Faslet/widget_php_module/tree/v0.2.0"
+            },
+            "time": "2022-11-21T10:24:43+00:00"
+        }
+    ],
+    "packages-dev": [
         {
             "name": "2tvenom/cborencode",
             "version": "1.0.2",
@@ -1939,47 +1982,6 @@
                 "source": "https://github.com/ezimuel/ringphp/tree/1.2.0"
             },
             "time": "2021-11-16T11:51:30+00:00"
-        },
-        {
-            "name": "faslet/faslet",
-            "version": "0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Faslet/widget_php_module.git",
-                "reference": "5acde265c828c1602a4d1f53276cabd372a06b0e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Faslet/widget_php_module/zipball/5acde265c828c1602a4d1f53276cabd372a06b0e",
-                "reference": "5acde265c828c1602a4d1f53276cabd372a06b0e",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^9"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Faslet\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Faslet Team",
-                    "email": "technology@faslet.me"
-                }
-            ],
-            "description": "The Faslet Size Me Up Widget",
-            "homepage": "https://github.com/Faslet/widget_php_module",
-            "support": {
-                "issues": "https://github.com/Faslet/widget_php_module/issues",
-                "source": "https://github.com/Faslet/widget_php_module/tree/0.1.0"
-            },
-            "time": "2022-02-24T08:08:30+00:00"
         },
         {
             "name": "fgrosse/phpasn1",
@@ -22863,7 +22865,6 @@
             "description": "Bundling metapackage for yotpo/magento2-module-yotpo-reviews: Yotpo Reviews extension for Magento2"
         }
     ],
-    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],
@@ -22871,5 +22872,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }
