@@ -55,16 +55,16 @@ class FasletWidget extends Template
       ->withOrderNumber($orderId)
       ->withPaymentStatus($orderStatus);
 
-    foreach ($order->getAllItems() as $orderItem) {
+    foreach ($order->getAllVisibleItems() as $orderItem) {
 
       $productId = $orderItem->getProductId();
       $productName = $orderItem->getName();
       $price = $orderItem->getPrice();
       // This may not work for your store, adjust this to what works for your store.
-      $quantity = $orderItem->getQtyToInvoice();
+      $quantity = $orderItem->getQtyOrdered();
 
       // Magento adds 2 items to your cart, one being the parent product, one being the variant. Variant is added with quantity 0, so skip that.
-      if ($quantity == 0) {
+      if ($quantity == 0 || $orderItem->getParentItemId() !== null) {
         continue;
       }
 
